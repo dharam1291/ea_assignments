@@ -1,0 +1,21 @@
+{
+  "principals": {
+    "demo-alpha-full": {"user_id": "user-a", "tenant_id": "tenant-a", "scopes": ["billing:read", "sales:read"]},
+    "demo-alpha-sales": {"user_id": "user-c", "tenant_id": "tenant-a", "scopes": ["sales:read"]},
+    "demo-beta-full": {"user_id": "user-b", "tenant_id": "tenant-b", "scopes": ["billing:read", "sales:read"]}
+  },
+  "agents": [
+    {"name": "billing-agent", "capability": "billing.summary", "required_scope": "billing:read", "tool": "billing_summary"},
+    {"name": "sales-agent", "capability": "sales.offers", "required_scope": "sales:read", "tool": "sales_offers"}
+  ],
+  "tool_results": {
+    "tenant-a": {
+      "billing.summary": {"amount_due": 42.0, "currency": "USD"},
+      "sales.offers": {"offers": [{"id": "a-starter", "name": "Alpha Starter"}]}
+    },
+    "tenant-b": {
+      "billing.summary": {"amount_due": 99.0, "currency": "USD"},
+      "sales.offers": {"offers": [{"id": "b-plus", "name": "Beta Plus"}]}
+    }
+  }
+}
