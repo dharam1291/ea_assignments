@@ -190,9 +190,11 @@ ok "Found Python: $PYTHON ($($PYTHON --version 2>&1))"
 
 setup_venv "$PYTHON"
 
+VENV_PYTHON="$SCRIPT_DIR/$VENV_DIR/bin/python"
+
 if [ "$MODE" = "test" ]; then
   log "Running pytest"
-  python -m pytest -q
+  "$VENV_PYTHON" -m pytest -q
   ok "All tests passed"
   exit 0
 fi
@@ -200,7 +202,7 @@ fi
 kill_port
 
 log "Starting Agent Gateway on http://127.0.0.1:$PORT"
-exec python -m uvicorn service.main:app \
+exec "$VENV_PYTHON" -m uvicorn service.main:app \
   --host 127.0.0.1 \
   --port "$PORT" \
   --workers 1 \
