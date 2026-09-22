@@ -1,3 +1,15 @@
+"""
+Billing agent — fixture-backed implementation of the BaseAgent protocol.
+
+Loads its identity, system prompt, and capability declaration from an
+externalized YAML config (prompts/billing_agent.yaml). In production,
+the system_prompt would be passed to a LangGraph ReAct node alongside
+the user's message; here the MockToolAdapter invokes the tool directly
+using fixture data because the assessment prohibits LLM/network calls.
+
+See base.py for the full rationale and migration path.
+"""
+
 import yaml
 from pathlib import Path
 
