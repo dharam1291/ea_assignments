@@ -1,6 +1,6 @@
 # Observable Agent Gateway
 
-> **[View Assessment Report](docs/assessment_report.html)** — Architecture, test results, and design decisions in one page. Auto-updates on every test and acceptance run.
+> **[View Assessment Report](https://htmlpreview.github.io/?https://github.com/dharam1291/ea_assignments/blob/improvemnts/docs/assessment_report.html)** — Architecture, test results, and design decisions in one page. Auto-updates on every test and acceptance run.
 
 A production-structured, observable agent gateway built with **Python 3.11+** and **FastAPI**. Resolves capabilities, enforces identity and scope-based permissions, invokes mock tool adapters with failure simulation, enforces retry/timeout policies, and records structured execution traces.
 

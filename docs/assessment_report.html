@@ -174,6 +174,8 @@
     color: var(--text-muted);
     max-height: 400px;
     overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
   }
   .code-block .pass { color: var(--green); }
   .code-block .header { color: var(--accent); font-weight: 600; }
@@ -219,6 +221,9 @@
     line-height: 1.8;
     color: var(--text-muted);
     overflow-x: auto;
+    white-space: pre;
+    margin: 0;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
   }
   .arch-tree .dir { color: var(--accent); font-weight: 600; }
   .arch-tree .file { color: var(--text-muted); }
@@ -421,42 +426,45 @@
           </div>
         </div>
       </div>
-      <div class="arch-tree">
-<span class="dir">service/</span>
-  main.py              <span class="desc"># Thin entry point</span>
-  <span class="dir">core/</span>
-    config.py          <span class="desc"># Frozen settings</span>
-    errors.py          <span class="desc"># Error hierarchy</span>
-    logging.py         <span class="desc"># JSON + redaction</span>
-    factory.py         <span class="desc"># App wiring</span>
-  <span class="dir">identity/</span>
-    resolver.py        <span class="desc"># Token &rarr; Principal</span>
-  <span class="dir">registry/</span>
-    models.py          <span class="desc"># AgentRegistration</span>
-    capability_registry.py
-  <span class="dir">agents/</span>
-    base.py            <span class="desc"># BaseAgent protocol</span>
-    billing_agent.py
-    sales_agent.py
-    <span class="dir">prompts/</span>    <span class="desc"># YAML configs</span>
-    <span class="dir">tools/</span>      <span class="desc"># Tool protocols</span>
-  <span class="dir">adapter/</span>
-    mock_adapter.py    <span class="desc"># 6 sim modes</span>
-    validators.py      <span class="desc"># Schema validation</span>
-  <span class="dir">executor/</span>
-    engine.py          <span class="desc"># Retry + timeout</span>
-    models.py          <span class="desc"># ExecutionResult</span>
-  <span class="dir">traces/</span>
-    store.py           <span class="desc"># In-memory + TTL</span>
-  <span class="dir">api/</span>
-    routes.py          <span class="desc"># /health /invoke /traces</span>
-    schemas.py         <span class="desc"># Pydantic models</span>
-    dependencies.py    <span class="desc"># Auth deps</span>
-    middleware.py      <span class="desc"># Request context</span>
-  <span class="dir">tests/</span>
-    conftest.py        <span class="desc"># Shared fixtures</span>
-    test_gateway.py    <span class="desc"># 40 tests</span>
-      </div>
+      <pre class="arch-tree"><span class="dir">service/</span>
+├── main.py                     <span class="desc"># Thin entry point</span>
+├── <span class="dir">core/</span>
+│   ├── config.py               <span class="desc"># Frozen settings</span>
+│   ├── errors.py               <span class="desc"># Error hierarchy</span>
+│   ├── logging.py              <span class="desc"># JSON + redaction</span>
+│   └── factory.py              <span class="desc"># App wiring</span>
+├── <span class="dir">identity/</span>
+│   └── resolver.py             <span class="desc"># Token &rarr; Principal</span>
+├── <span class="dir">registry/</span>
+│   ├── models.py               <span class="desc"># AgentRegistration</span>
+│   └── capability_registry.py
+├── <span class="dir">agents/</span>
+│   ├── base.py                 <span class="desc"># BaseAgent protocol</span>
+│   ├── billing_agent.py
+│   ├── sales_agent.py
+│   ├── <span class="dir">prompts/</span>             <span class="desc"># YAML configs</span>
+│   │   ├── billing_agent.yaml
+│   │   └── sales_agent.yaml
+│   └── <span class="dir">tools/</span>               <span class="desc"># Tool protocols</span>
+│       ├── base.py
+│       ├── billing_summary.py
+│       └── sales_offers.py
+├── <span class="dir">adapter/</span>
+│   ├── mock_adapter.py         <span class="desc"># 6 sim modes</span>
+│   └── validators.py           <span class="desc"># Schema validation</span>
+├── <span class="dir">executor/</span>
+│   ├── engine.py               <span class="desc"># Retry + timeout</span>
+│   └── models.py               <span class="desc"># ExecutionResult</span>
+├── <span class="dir">traces/</span>
+│   └── store.py                <span class="desc"># In-memory + TTL</span>
+├── <span class="dir">api/</span>
+│   ├── routes.py               <span class="desc"># /health /invoke /traces</span>
+│   ├── schemas.py              <span class="desc"># Pydantic models</span>
+│   ├── dependencies.py         <span class="desc"># Auth deps</span>
+│   └── middleware.py           <span class="desc"># Request context</span>
+└── <span class="dir">tests/</span>
+    ├── conftest.py             <span class="desc"># Shared fixtures</span>
+    └── test_gateway.py         <span class="desc"># 40 tests</span></pre>
     </div>
   </section>
 
