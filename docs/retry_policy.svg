@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 200" font-family="Segoe UI, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#555"/>
+    </marker>
+    <filter id="s" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  <rect width="780" height="200" fill="#fafbfc" rx="8"/>
+  <text x="390" y="28" text-anchor="middle" font-size="17" font-weight="bold" fill="#1a1a2e">Retry Policy — Transient Error Backoff</text>
+
+  <!-- Attempt 1 -->
+  <rect x="30" y="60" width="120" height="44" rx="8" fill="#4a90d9" filter="url(#s)"/>
+  <text x="90" y="80" text-anchor="middle" fill="#fff" font-weight="bold">Attempt 1</text>
+  <text x="90" y="96" text-anchor="middle" fill="#dce6f0" font-size="10">invoke adapter</text>
+
+  <line x1="150" y1="82" x2="190" y2="82" stroke="#d68910" stroke-width="2" marker-end="url(#a)"/>
+  <text x="170" y="74" text-anchor="middle" fill="#c0392b" font-size="10" font-weight="bold">fail</text>
+
+  <!-- Sleep 50ms -->
+  <rect x="192" y="66" width="100" height="32" rx="6" fill="#f39c12" filter="url(#s)"/>
+  <text x="242" y="87" text-anchor="middle" fill="#fff" font-weight="bold" font-size="12">sleep 50ms</text>
+
+  <line x1="292" y1="82" x2="330" y2="82" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+
+  <!-- Attempt 2 -->
+  <rect x="332" y="60" width="120" height="44" rx="8" fill="#4a90d9" filter="url(#s)"/>
+  <text x="392" y="80" text-anchor="middle" fill="#fff" font-weight="bold">Attempt 2</text>
+  <text x="392" y="96" text-anchor="middle" fill="#dce6f0" font-size="10">invoke adapter</text>
+
+  <line x1="452" y1="82" x2="490" y2="82" stroke="#d68910" stroke-width="2" marker-end="url(#a)"/>
+  <text x="471" y="74" text-anchor="middle" fill="#c0392b" font-size="10" font-weight="bold">fail</text>
+
+  <!-- Sleep 100ms -->
+  <rect x="492" y="66" width="110" height="32" rx="6" fill="#f39c12" filter="url(#s)"/>
+  <text x="547" y="87" text-anchor="middle" fill="#fff" font-weight="bold" font-size="12">sleep 100ms</text>
+
+  <line x1="602" y1="82" x2="640" y2="82" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+
+  <!-- Attempt 3 -->
+  <rect x="642" y="60" width="120" height="44" rx="8" fill="#4a90d9" filter="url(#s)"/>
+  <text x="702" y="80" text-anchor="middle" fill="#fff" font-weight="bold">Attempt 3</text>
+  <text x="702" y="96" text-anchor="middle" fill="#dce6f0" font-size="10">invoke adapter</text>
+
+  <!-- Success path -->
+  <line x1="672" y1="104" x2="672" y2="144" stroke="#1e8449" stroke-width="2" marker-end="url(#a)"/>
+  <text x="656" y="128" fill="#27ae60" font-size="10" font-weight="bold">OK</text>
+  <rect x="626" y="146" width="92" height="30" rx="6" fill="#27ae60" filter="url(#s)"/>
+  <text x="672" y="166" text-anchor="middle" fill="#fff" font-weight="bold" font-size="12">200</text>
+
+  <!-- Failure path -->
+  <line x1="732" y1="104" x2="732" y2="144" stroke="#c0392b" stroke-width="2" marker-end="url(#a)"/>
+  <text x="748" y="128" fill="#c0392b" font-size="10" font-weight="bold">fail</text>
+  <rect x="696" y="146" width="72" height="30" rx="6" fill="#e74c3c" filter="url(#s)"/>
+  <text x="732" y="166" text-anchor="middle" fill="#fff" font-weight="bold" font-size="12">503</text>
+
+  <!-- Notes -->
+  <text x="390" y="192" text-anchor="middle" fill="#7f8c8d" font-size="11">Permanent errors, malformed results, and timeouts are terminal — not retried  |  250ms per-attempt timeout enforced via asyncio.wait_for</text>
+</svg>
