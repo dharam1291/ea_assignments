@@ -230,7 +230,7 @@ def update_acceptance_report(results, total, passed):
     output_lines = "\n".join(lines)
     summary_class = "pass" if passed == total else 'fail" style="color:var(--red)'
     block = f'''      <div id="acceptance-output" class="tab-content">
-        <div class="code-block">
+        <div class="code-block" style="white-space:pre-wrap!important;word-break:break-word!important;font-family:'JetBrains Mono','Fira Code',monospace!important;">
 <span class="header">$ python tools/acceptance_check.py --base-url http://127.0.0.1:8000</span>
 
 {output_lines}

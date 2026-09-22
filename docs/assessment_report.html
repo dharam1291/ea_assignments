@@ -161,7 +161,7 @@
   .badge-info { background: rgba(56, 189, 248, 0.15); color: var(--accent); }
   .badge-warn { background: rgba(251, 191, 36, 0.15); color: var(--yellow); }
   code, .code-block {
-    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace !important;
   }
   .code-block {
     background: var(--bg-code);
@@ -169,13 +169,13 @@
     border-radius: 8px;
     padding: 20px;
     overflow-x: auto;
-    font-size: 0.8rem;
-    line-height: 1.7;
+    font-size: 0.8rem !important;
+    line-height: 1.7 !important;
     color: var(--text-muted);
     max-height: 400px;
     overflow-y: auto;
-    white-space: pre-wrap;
-    word-break: break-word;
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
   }
   .code-block .pass { color: var(--green); }
   .code-block .header { color: var(--accent); font-weight: 600; }
@@ -217,13 +217,13 @@
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 24px;
-    font-size: 0.8rem;
-    line-height: 1.8;
+    font-size: 0.8rem !important;
+    line-height: 1.8 !important;
     color: var(--text-muted);
     overflow-x: auto;
-    white-space: pre;
+    white-space: pre !important;
     margin: 0;
-    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace !important;
   }
   .arch-tree .dir { color: var(--accent); font-weight: 600; }
   .arch-tree .file { color: var(--text-muted); }
@@ -426,7 +426,7 @@
           </div>
         </div>
       </div>
-      <pre class="arch-tree"><span class="dir">service/</span>
+      <pre class="arch-tree" style="white-space:pre!important;font-family:'JetBrains Mono','Fira Code',monospace!important;font-size:0.8rem!important;line-height:1.8!important;"><span class="dir">service/</span>
 ├── main.py                     <span class="desc"># Thin entry point</span>
 ├── <span class="dir">core/</span>
 │   ├── config.py               <span class="desc"># Frozen settings</span>
@@ -729,7 +729,7 @@
       </div>
       <!-- PYTEST_OUTPUT_START -->
       <div id="pytest" class="tab-content active">
-        <div class="code-block">
+        <div class="code-block" style="white-space:pre-wrap!important;word-break:break-word!important;font-family:'JetBrains Mono','Fira Code',monospace!important;">
 <span class="header">$ python -m pytest service/tests/ -v</span>
 
 <span class="pass">PASSED</span> TestCapabilityRouting::test_billing_summary_returns_valid_schema
@@ -779,7 +779,7 @@
       <!-- PYTEST_OUTPUT_END -->
       <!-- ACCEPTANCE_OUTPUT_START -->
       <div id="acceptance-output" class="tab-content">
-        <div class="code-block">
+        <div class="code-block" style="white-space:pre-wrap!important;word-break:break-word!important;font-family:'JetBrains Mono','Fira Code',monospace!important;">
 <span class="header">$ python tools/acceptance_check.py --base-url http://127.0.0.1:8000</span>
 
 <span class="pass">PASS</span> health
@@ -897,7 +897,7 @@
   <section class="section">
     <h2 class="section-title"><span class="dot"></span>Quick Start</h2>
     <div class="card">
-      <div class="code-block" style="max-height:none;">
+      <div class="code-block" style="max-height:none;white-space:pre-wrap!important;word-break:break-word!important;font-family:'JetBrains Mono','Fira Code',monospace!important;">
 <span class="header"># Show all available commands</span>
 ./start_service.sh --helper
 

@@ -137,7 +137,7 @@ summary_class = 'pass' if failed == 0 else 'fail\" style=\"color:var(--red)'
 all_text = 'ALL PASS' if failed == 0 else f'{failed} FAILED'
 
 pytest_block = f'''      <div id=\"pytest\" class=\"tab-content active\">
-        <div class=\"code-block\">
+        <div class=\"code-block\" style=\"white-space:pre-wrap!important;word-break:break-word!important;font-family:'JetBrains Mono','Fira Code',monospace!important;\">
 <span class=\"header\">\$ python -m pytest service/tests/ -v</span>
 
 {pytest_lines}
