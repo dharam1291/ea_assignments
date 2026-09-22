@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Observable Agent Gateway - Assessment Report</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --bg-card: #1e293b;
+    --bg-code: #0d1117;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent-2: #818cf8;
+    --accent-3: #a78bfa;
+    --green: #4ade80;
+    --red: #f87171;
+    --orange: #fb923c;
+    --yellow: #fbbf24;
+    --border: #334155;
+    --gradient-1: linear-gradient(135deg, #38bdf8, #818cf8);
+    --gradient-2: linear-gradient(135deg, #818cf8, #a78bfa);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  .hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    padding: 80px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(56, 189, 248, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(129, 140, 248, 0.08) 0%, transparent 50%);
+    animation: rotate 20s linear infinite;
+  }
+  @keyframes rotate { to { transform: rotate(360deg); } }
+  .hero-content { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+  .hero h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    background: var(--gradient-1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+  }
+  .hero .subtitle {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+  }
+  .hero .meta {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .hero .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+  .hero .meta-item span { color: var(--accent); font-weight: 600; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+  .section { margin-bottom: 60px; }
+  .section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-title .dot {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .grid { display: grid; gap: 20px; }
+  .grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .grid-3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+  .grid-4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--accent); }
+  .card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    color: var(--accent);
+  }
+  .card p { color: var(--text-muted); font-size: 0.9rem; }
+  .stat-card {
+    text-align: center;
+    padding: 32px 24px;
+  }
+  .stat-card .number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: var(--gradient-1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .stat-card .label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  th {
+    background: var(--bg-code);
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--accent);
+    border-bottom: 2px solid var(--border);
+  }
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+  tr:hover td { background: rgba(56, 189, 248, 0.03); }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .badge-pass { background: rgba(74, 222, 128, 0.15); color: var(--green); }
+  .badge-fail { background: rgba(248, 113, 113, 0.15); color: var(--red); }
+  .badge-info { background: rgba(56, 189, 248, 0.15); color: var(--accent); }
+  .badge-warn { background: rgba(251, 191, 36, 0.15); color: var(--yellow); }
+  code, .code-block {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  }
+  .code-block {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    overflow-x: auto;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .code-block .pass { color: var(--green); }
+  .code-block .header { color: var(--accent); font-weight: 600; }
+  .pipeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    padding: 20px 0;
+  }
+  .pipeline-step {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    min-width: 140px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .pipeline-step .step-num {
+    font-size: 0.7rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+  .pipeline-step .step-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .pipeline-arrow {
+    color: var(--accent);
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    padding: 0 4px;
+  }
+  .arch-tree {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    font-size: 0.8rem;
+    line-height: 1.8;
+    color: var(--text-muted);
+    overflow-x: auto;
+  }
+  .arch-tree .dir { color: var(--accent); font-weight: 600; }
+  .arch-tree .file { color: var(--text-muted); }
+  .arch-tree .desc { color: #64748b; }
+  .diagram-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    overflow-x: auto;
+  }
+  .diagram-container img {
+    max-width: 100%;
+    height: auto;
+  }
+  .diagram-caption {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 12px;
+    font-style: italic;
+  }
+  .security-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .security-item:last-child { border-bottom: none; }
+  .security-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(74, 222, 128, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--green);
+    font-size: 0.7rem;
+  }
+  .migration-card {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.05), rgba(129, 140, 248, 0.05));
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .migration-card h4 {
+    color: var(--accent-2);
+    margin-bottom: 12px;
+    font-size: 1rem;
+  }
+  .migration-card .where {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .migration-card p { color: var(--text-muted); font-size: 0.88rem; }
+  .footer {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+  }
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(15, 23, 42, 0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+  }
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    overflow-x: auto;
+  }
+  .nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+  .nav a:hover { color: var(--accent); }
+  .tab-container { margin-top: 16px; }
+  .tab-buttons { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+  .tab-btn {
+    padding: 10px 20px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.85rem;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-btn:hover { color: var(--accent); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 2rem; }
+    .hero { padding: 48px 20px; }
+    .pipeline { flex-direction: column; }
+    .pipeline-arrow { transform: rotate(90deg); }
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#overview" style="color:var(--accent);font-weight:700;">Agent Gateway</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#pipeline">Pipeline</a>
+    <a href="#simulation">Simulation</a>
+    <a href="#security">Security</a>
+    <a href="#tests">Tests</a>
+    <a href="#acceptance">Acceptance</a>
+    <a href="#migration">Migration</a>
+    <a href="#design">Design Decisions</a>
+  </div>
+</nav>
+
+<header class="hero" id="overview">
+  <div class="hero-content">
+    <h1>Observable Agent Gateway</h1>
+    <p class="subtitle">A production-structured, multi-tenant agent gateway with identity resolution, capability routing, failure simulation, and structured execution traces.</p>
+    <div class="meta">
+      <div class="meta-item">Candidate: <span>Dharmendra Singh</span></div>
+      <div class="meta-item">Stack: <span>Python 3.11 + FastAPI</span></div>
+      <!-- HERO_TEST_STATS_START --><div class="meta-item">Tests: <span>40 passed</span></div><!-- HERO_TEST_STATS_END -->
+      <!-- HERO_ACCEPTANCE_STATS_START --><div class="meta-item">Acceptance: <span>14/14</span></div><!-- HERO_ACCEPTANCE_STATS_END -->
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Stats -->
+  <section class="section">
+    <div class="grid grid-4">
+      <div class="card stat-card">
+        <div class="number">5</div>
+        <div class="label">Boundaries</div>
+      </div>
+      <div class="card stat-card">
+        <div class="number">6</div>
+        <div class="label">Simulation Modes</div>
+      </div>
+      <!-- STAT_TESTS_START --><div class="card stat-card">
+        <div class="number">40</div>
+        <div class="label">Tests Passed</div>
+      </div><!-- STAT_TESTS_END -->
+      <!-- STAT_ACCEPTANCE_START --><div class="card stat-card">
+        <div class="number">14/14</div>
+        <div class="label">Acceptance Checks</div>
+      </div><!-- STAT_ACCEPTANCE_END -->
+    </div>
+  </section>
+
+  <!-- Architecture -->
+  <section class="section" id="architecture">
+    <h2 class="section-title"><span class="dot"></span>Architecture</h2>
+    <div class="grid grid-2">
+      <div>
+        <p style="color:var(--text-muted);margin-bottom:16px;">
+          Modular subpackage architecture with clean separation of concerns. Each boundary is a protocol-based interface injected via the application factory, enabling independent testing and production swaps without cascading changes.
+        </p>
+        <div class="grid" style="gap:12px;">
+          <div class="card" style="padding:16px;">
+            <h3 style="font-size:0.9rem;">Identity Layer</h3>
+            <p>Token-to-principal resolution with scope extraction</p>
+          </div>
+          <div class="card" style="padding:16px;">
+            <h3 style="font-size:0.9rem;">Registry Layer</h3>
+            <p>Capability-to-agent routing with scope enforcement</p>
+          </div>
+          <div class="card" style="padding:16px;">
+            <h3 style="font-size:0.9rem;">Adapter Layer</h3>
+            <p>Mock tool adapter with 6 simulation modes</p>
+          </div>
+          <div class="card" style="padding:16px;">
+            <h3 style="font-size:0.9rem;">Execution Layer</h3>
+            <p>Retry loop, exponential backoff, timeout enforcement</p>
+          </div>
+          <div class="card" style="padding:16px;">
+            <h3 style="font-size:0.9rem;">Trace Layer</h3>
+            <p>In-memory store with TTL expiration and ownership isolation</p>
+          </div>
+        </div>
+      </div>
+      <div class="arch-tree">
+<span class="dir">service/</span>
+  main.py              <span class="desc"># Thin entry point</span>
+  <span class="dir">core/</span>
+    config.py          <span class="desc"># Frozen settings</span>
+    errors.py          <span class="desc"># Error hierarchy</span>
+    logging.py         <span class="desc"># JSON + redaction</span>
+    factory.py         <span class="desc"># App wiring</span>
+  <span class="dir">identity/</span>
+    resolver.py        <span class="desc"># Token &rarr; Principal</span>
+  <span class="dir">registry/</span>
+    models.py          <span class="desc"># AgentRegistration</span>
+    capability_registry.py
+  <span class="dir">agents/</span>
+    base.py            <span class="desc"># BaseAgent protocol</span>
+    billing_agent.py
+    sales_agent.py
+    <span class="dir">prompts/</span>    <span class="desc"># YAML configs</span>
+    <span class="dir">tools/</span>      <span class="desc"># Tool protocols</span>
+  <span class="dir">adapter/</span>
+    mock_adapter.py    <span class="desc"># 6 sim modes</span>
+    validators.py      <span class="desc"># Schema validation</span>
+  <span class="dir">executor/</span>
+    engine.py          <span class="desc"># Retry + timeout</span>
+    models.py          <span class="desc"># ExecutionResult</span>
+  <span class="dir">traces/</span>
+    store.py           <span class="desc"># In-memory + TTL</span>
+  <span class="dir">api/</span>
+    routes.py          <span class="desc"># /health /invoke /traces</span>
+    schemas.py         <span class="desc"># Pydantic models</span>
+    dependencies.py    <span class="desc"># Auth deps</span>
+    middleware.py      <span class="desc"># Request context</span>
+  <span class="dir">tests/</span>
+    conftest.py        <span class="desc"># Shared fixtures</span>
+    test_gateway.py    <span class="desc"># 40 tests</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Request Pipeline -->
+  <section class="section" id="pipeline">
+    <h2 class="section-title"><span class="dot"></span>Request Execution Pipeline</h2>
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <div class="step-num">Step 1</div>
+        <div class="step-name">Extract Token</div>
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="pipeline-step">
+        <div class="step-num">Step 2</div>
+        <div class="step-name">Resolve Identity</div>
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="pipeline-step">
+        <div class="step-num">Step 3</div>
+        <div class="step-name">Check Scope</div>
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="pipeline-step">
+        <div class="step-num">Step 4</div>
+        <div class="step-name">Route to Agent</div>
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="pipeline-step">
+        <div class="step-num">Step 5</div>
+        <div class="step-name">Execute Tool</div>
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="pipeline-step">
+        <div class="step-num">Step 6</div>
+        <div class="step-name">Retry / Timeout</div>
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="pipeline-step">
+        <div class="step-num">Step 7</div>
+        <div class="step-name">Record Trace</div>
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="pipeline-step">
+        <div class="step-num">Step 8</div>
+        <div class="step-name">Return Result</div>
+      </div>
+    </div>
+    <div class="grid grid-2" style="margin-top:20px;">
+      <div class="card">
+        <h3>Retry Policy</h3>
+        <p style="margin-bottom:12px;">Exponential backoff for transient failures only. Max 3 attempts with injectable sleep for deterministic testing.</p>
+        <table>
+          <tr><th>Attempt</th><th>Delay Before</th></tr>
+          <tr><td>1</td><td>0ms (immediate)</td></tr>
+          <tr><td>2</td><td>50ms</td></tr>
+          <tr><td>3</td><td>100ms</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Timeout Enforcement</h3>
+        <p style="margin-bottom:12px;">Each attempt is individually capped at 250ms via <code>asyncio.wait_for()</code>. Late results cannot overwrite a failed trace.</p>
+        <table>
+          <tr><th>Parameter</th><th>Value</th></tr>
+          <tr><td>Per-attempt timeout</td><td>250ms</td></tr>
+          <tr><td>Max total attempts</td><td>3</td></tr>
+          <tr><td>Timeout simulation delay</td><td>2000ms</td></tr>
+          <tr><td>Late result handling</td><td>Discarded</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Simulation Modes -->
+  <section class="section" id="simulation">
+    <h2 class="section-title"><span class="dot"></span>Simulation Modes</h2>
+    <p style="color:var(--text-muted);margin-bottom:20px;">
+      The mock adapter supports 6 simulation modes, enabling deterministic testing of every failure path without external dependencies. Each mode is selected per-request via the <code>simulation</code> field.
+    </p>
+    <div class="card" style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Mode</th>
+            <th>Adapter Behavior</th>
+            <th>HTTP</th>
+            <th>Error Code</th>
+            <th>Retry?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>ok</code></td>
+            <td>Returns fixture result immediately</td>
+            <td><span class="badge badge-pass">200</span></td>
+            <td>&mdash;</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td><code>transient_then_ok</code></td>
+            <td>Fails 2x, succeeds on attempt 3</td>
+            <td><span class="badge badge-pass">200</span></td>
+            <td>&mdash;</td>
+            <td>Yes (recovers)</td>
+          </tr>
+          <tr>
+            <td><code>transient_always</code></td>
+            <td>All 3 attempts fail with transient error</td>
+            <td><span class="badge badge-fail">503</span></td>
+            <td>UPSTREAM_UNAVAILABLE</td>
+            <td>Yes (exhausted)</td>
+          </tr>
+          <tr>
+            <td><code>permanent_error</code></td>
+            <td>Non-retryable error on first attempt</td>
+            <td><span class="badge badge-fail">502</span></td>
+            <td>UPSTREAM_PERMANENT</td>
+            <td>No (fatal)</td>
+          </tr>
+          <tr>
+            <td><code>malformed_result</code></td>
+            <td>Returns invalid schema</td>
+            <td><span class="badge badge-fail">502</span></td>
+            <td>INVALID_TOOL_RESULT</td>
+            <td>No (schema)</td>
+          </tr>
+          <tr>
+            <td><code>timeout</code></td>
+            <td>2s sleep, 250ms timeout enforced</td>
+            <td><span class="badge badge-warn">504</span></td>
+            <td>UPSTREAM_TIMEOUT</td>
+            <td>Yes (all timeout)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Security -->
+  <section class="section" id="security">
+    <h2 class="section-title"><span class="dot"></span>Security Model</h2>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Enforced Constraints</h3>
+        <div class="security-item">
+          <div class="security-icon">&#10003;</div>
+          <div><strong style="color:var(--text);">Token-only identity</strong><br><span style="font-size:0.85rem;">X-Tenant-ID, X-Scopes headers are ignored. Principal comes from bearer token only.</span></div>
+        </div>
+        <div class="security-item">
+          <div class="security-icon">&#10003;</div>
+          <div><strong style="color:var(--text);">Pre-adapter scope check</strong><br><span style="font-size:0.85rem;">403 returned before adapter is ever called. No wasted computation on unauthorized requests.</span></div>
+        </div>
+        <div class="security-item">
+          <div class="security-icon">&#10003;</div>
+          <div><strong style="color:var(--text);">Body field isolation</strong><br><span style="font-size:0.85rem;">Unknown fields (user_id, tenant_id, scopes) in the request body are silently ignored.</span></div>
+        </div>
+        <div class="security-item">
+          <div class="security-icon">&#10003;</div>
+          <div><strong style="color:var(--text);">Trace ownership</strong><br><span style="font-size:0.85rem;">Same user + same tenant required. No admin bypass. Unknown traces return 404.</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Information Hiding</h3>
+        <div class="security-item">
+          <div class="security-icon">&#10003;</div>
+          <div><strong style="color:var(--text);">No stack traces in errors</strong><br><span style="font-size:0.85rem;">Error responses contain structured error codes and safe messages only.</span></div>
+        </div>
+        <div class="security-item">
+          <div class="security-icon">&#10003;</div>
+          <div><strong style="color:var(--text);">No tokens in traces</strong><br><span style="font-size:0.85rem;">Bearer tokens, raw message text, and tool payloads are redacted from stored traces.</span></div>
+        </div>
+        <div class="security-item">
+          <div class="security-icon">&#10003;</div>
+          <div><strong style="color:var(--text);">Debug log redaction</strong><br><span style="font-size:0.85rem;">Structured JSON logging redacts bearer tokens, message text, and tool-result bodies.</span></div>
+        </div>
+        <div class="security-item">
+          <div class="security-icon">&#10003;</div>
+          <div><strong style="color:var(--text);">No baked credentials</strong><br><span style="font-size:0.85rem;">Docker image contains no credentials. Fixture data is for demo scenarios only.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Test Results -->
+  <section class="section" id="tests">
+    <h2 class="section-title"><span class="dot"></span>Test Results</h2>
+    <p style="color:var(--text-muted);margin-bottom:20px;">
+      40 tests across 8 test classes covering all 7 required assessment categories. Deterministic timing via injectable sleep.
+    </p>
+    <div class="card" style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Tests</th>
+            <th>Status</th>
+            <th>What's Proved</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Capability Routing</td>
+            <td>4</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td>Both agents route correctly, unknown &rarr; 404, health works</td>
+          </tr>
+          <tr>
+            <td>Auth &amp; Authorization</td>
+            <td>10</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td>Missing/bad/empty tokens &rarr; 401, wrong scope &rarr; 403, adapter not called</td>
+          </tr>
+          <tr>
+            <td>Tenant Isolation</td>
+            <td>7</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td>Cross-tenant results isolated, cross-tenant/user traces &rarr; 404</td>
+          </tr>
+          <tr>
+            <td>Simulation Modes</td>
+            <td>8</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td>All 6 modes verified, retry delays measured with injected clock</td>
+          </tr>
+          <tr>
+            <td>Concurrent Isolation</td>
+            <td>2</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td>Barrier-synchronized overlapping requests, separate traces</td>
+          </tr>
+          <tr>
+            <td>Timeout Cancellation</td>
+            <td>1</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td>Late result cannot overwrite failed trace</td>
+          </tr>
+          <tr>
+            <td>Secret Redaction</td>
+            <td>4</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td>Secrets absent from traces, logs, error responses</td>
+          </tr>
+          <tr>
+            <td>Edge Cases</td>
+            <td>4</td>
+            <td><span class="badge badge-pass">PASS</span></td>
+            <td>Unique IDs, format, unknown fields ignored, unauth trace &rarr; 401</td>
+          </tr>
+          <tr style="font-weight:700;">
+            <td style="color:var(--accent);">Total</td>
+            <td style="color:var(--accent);">40</td>
+            <td><span class="badge badge-pass">ALL PASS</span></td>
+            <td style="color:var(--green);">0.75s execution time</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tab-container">
+      <div class="tab-buttons">
+        <button class="tab-btn active" onclick="showTab('pytest')">Pytest Output</button>
+        <button class="tab-btn" onclick="showTab('acceptance-output')">Acceptance Check</button>
+      </div>
+      <!-- PYTEST_OUTPUT_START -->
+      <div id="pytest" class="tab-content active">
+        <div class="code-block">
+<span class="header">$ python -m pytest service/tests/ -v</span>
+
+<span class="pass">PASSED</span> TestCapabilityRouting::test_billing_summary_returns_valid_schema
+<span class="pass">PASSED</span> TestCapabilityRouting::test_sales_offers_returns_valid_schema
+<span class="pass">PASSED</span> TestCapabilityRouting::test_unknown_capability_returns_404
+<span class="pass">PASSED</span> TestCapabilityRouting::test_health_endpoint
+<span class="pass">PASSED</span> TestAuthenticationAuthorization::test_missing_auth_header_returns_401
+<span class="pass">PASSED</span> TestAuthenticationAuthorization::test_invalid_token_returns_401
+<span class="pass">PASSED</span> TestAuthenticationAuthorization::test_malformed_auth_header_returns_401
+<span class="pass">PASSED</span> TestAuthenticationAuthorization::test_empty_bearer_returns_401
+<span class="pass">PASSED</span> TestAuthenticationAuthorization::test_insufficient_scope_returns_403
+<span class="pass">PASSED</span> TestAuthenticationAuthorization::test_adapter_not_called_on_auth_failure
+<span class="pass">PASSED</span> TestAuthenticationAuthorization::test_adapter_not_called_on_scope_failure
+<span class="pass">PASSED</span> TestAuthenticationAuthorization::test_extra_headers_do_not_override_principal
+<span class="pass">PASSED</span> TestAuthenticationAuthorization::test_input_validation_returns_422
+<span class="pass">PASSED</span> TestAuthenticationAuthorization::test_invalid_simulation_returns_422
+<span class="pass">PASSED</span> TestTenantIsolation::test_tenant_a_gets_tenant_a_billing_result
+<span class="pass">PASSED</span> TestTenantIsolation::test_tenant_b_gets_tenant_b_billing_result
+<span class="pass">PASSED</span> TestTenantIsolation::test_cross_tenant_trace_not_accessible
+<span class="pass">PASSED</span> TestTenantIsolation::test_same_tenant_different_user_trace_not_accessible
+<span class="pass">PASSED</span> TestTenantIsolation::test_same_conversation_id_different_tenants_isolated
+<span class="pass">PASSED</span> TestTenantIsolation::test_own_trace_is_accessible
+<span class="pass">PASSED</span> TestTenantIsolation::test_nonexistent_trace_returns_404
+<span class="pass">PASSED</span> TestSimulationModes::test_ok_simulation
+<span class="pass">PASSED</span> TestSimulationModes::test_transient_then_ok_simulation
+<span class="pass">PASSED</span> TestSimulationModes::test_transient_always_simulation
+<span class="pass">PASSED</span> TestSimulationModes::test_permanent_error_simulation
+<span class="pass">PASSED</span> TestSimulationModes::test_malformed_result_simulation
+<span class="pass">PASSED</span> TestSimulationModes::test_timeout_simulation
+<span class="pass">PASSED</span> TestSimulationModes::test_retry_delays_are_deterministic
+<span class="pass">PASSED</span> TestSimulationModes::test_trace_events_match_simulation_transient_then_ok
+<span class="pass">PASSED</span> TestConcurrentIsolation::test_overlapping_invocations_isolated
+<span class="pass">PASSED</span> TestConcurrentIsolation::test_overlapping_traces_isolated
+<span class="pass">PASSED</span> TestTimeoutCancellation::test_late_result_does_not_overwrite_trace
+<span class="pass">PASSED</span> TestSecretRedaction::test_secret_not_in_traces
+<span class="pass">PASSED</span> TestSecretRedaction::test_secret_not_in_logs
+<span class="pass">PASSED</span> TestSecretRedaction::test_error_response_does_not_expose_raw_payload
+<span class="pass">PASSED</span> TestSecretRedaction::test_error_envelope_no_stack_trace
+<span class="pass">PASSED</span> TestEdgeCases::test_each_invoke_gets_unique_request_id
+<span class="pass">PASSED</span> TestEdgeCases::test_request_id_format
+<span class="pass">PASSED</span> TestEdgeCases::test_unknown_body_fields_ignored
+<span class="pass">PASSED</span> TestEdgeCases::test_trace_unauthenticated_returns_401
+
+<span class="pass">========== 40 passed in 0.75s ==========</span>
+        </div>
+      </div>
+      <!-- PYTEST_OUTPUT_END -->
+      <!-- ACCEPTANCE_OUTPUT_START -->
+      <div id="acceptance-output" class="tab-content">
+        <div class="code-block">
+<span class="header">$ python tools/acceptance_check.py --base-url http://127.0.0.1:8000</span>
+
+<span class="pass">PASS</span> health
+<span class="pass">PASS</span> credentials
+<span class="pass">PASS</span> scope enforcement
+<span class="pass">PASS</span> routing and tenant results
+<span class="pass">PASS</span> input validation
+<span class="pass">PASS</span> trace ownership
+<span class="pass">PASS</span> identity override rejected
+<span class="pass">PASS</span> message cannot override routing
+<span class="pass">PASS</span> transient_then_ok
+<span class="pass">PASS</span> transient_always
+<span class="pass">PASS</span> permanent_error
+<span class="pass">PASS</span> malformed_result
+<span class="pass">PASS</span> timeout
+<span class="pass">PASS</span> overlapping request isolation
+
+<span class="pass">14/14 check groups passed</span>
+        </div>
+      </div>
+      <!-- ACCEPTANCE_OUTPUT_END -->
+    </div>
+  </section>
+
+  <!-- Acceptance Checks -->
+  <section class="section" id="acceptance">
+    <h2 class="section-title"><span class="dot"></span>Acceptance Check Breakdown</h2>
+    <div class="grid grid-3">
+      <div class="card">
+        <h3>Identity &amp; Auth</h3>
+        <p><span class="badge badge-pass">4/4</span></p>
+        <ul style="list-style:none;margin-top:12px;font-size:0.85rem;color:var(--text-muted);">
+          <li>&#10003; Health endpoint</li>
+          <li>&#10003; Credential validation</li>
+          <li>&#10003; Scope enforcement</li>
+          <li>&#10003; Identity override rejected</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Routing &amp; Isolation</h3>
+        <p><span class="badge badge-pass">4/4</span></p>
+        <ul style="list-style:none;margin-top:12px;font-size:0.85rem;color:var(--text-muted);">
+          <li>&#10003; Routing + tenant results</li>
+          <li>&#10003; Input validation</li>
+          <li>&#10003; Trace ownership</li>
+          <li>&#10003; Overlapping request isolation</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Failure Simulation</h3>
+        <p><span class="badge badge-pass">6/6</span></p>
+        <ul style="list-style:none;margin-top:12px;font-size:0.85rem;color:var(--text-muted);">
+          <li>&#10003; Message cannot override routing</li>
+          <li>&#10003; transient_then_ok</li>
+          <li>&#10003; transient_always</li>
+          <li>&#10003; permanent_error</li>
+          <li>&#10003; malformed_result</li>
+          <li>&#10003; timeout</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Migration Path -->
+  <section class="section" id="migration">
+    <h2 class="section-title"><span class="dot"></span>Production Migration Paths</h2>
+    <div class="grid grid-2" style="gap:24px;">
+      <div class="migration-card">
+        <h4>OIDC Identity Provider</h4>
+        <div class="where">service/identity/resolver.py</div>
+        <p>Replace <code>IdentityResolver</code> with a <code>JWTIdentityResolver</code> that validates JWT signatures against the OIDC provider's JWKS endpoint, extracts <code>sub</code>, <code>tenant_id</code>, and <code>scope</code> claims. The <code>Principal</code> dataclass and all downstream code remain unchanged because the resolver is a protocol-based interface injected via the factory.</p>
+      </div>
+      <div class="migration-card">
+        <h4>MCP Tool Server</h4>
+        <div class="where">service/adapter/mock_adapter.py</div>
+        <p>Replace <code>MockToolAdapter</code> with an <code>MCPToolAdapter</code> that establishes MCP client sessions and calls <code>session.call_tool()</code>. The execution engine's retry, timeout, and trace recording logic is completely decoupled from the adapter and remains untouched. YAML tool declarations already map to MCP tool discovery.</p>
+      </div>
+      <div class="migration-card">
+        <h4>Redis Trace Store</h4>
+        <div class="where">service/traces/store.py</div>
+        <p>Implement <code>RedisTraceStore</code> with the same <code>store()</code>/<code>get()</code> interface. Enables trace persistence across restarts, horizontal scaling with multiple workers, and native TTL expiration via Redis <code>EXPIRE</code> instead of lazy cleanup.</p>
+      </div>
+      <div class="migration-card">
+        <h4>LangGraph Agent Integration</h4>
+        <div class="where">service/agents/base.py</div>
+        <p>System prompts are externalized in YAML, tools follow a protocol mapping to LangChain's <code>BaseTool</code>. Each agent exposes <code>system_prompt</code> + <code>tools</code> &mdash; a LangGraph <code>StateGraph</code> node consumes both. The gateway's retry, timeout, tracing, and auth layers remain completely untouched.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Design Decisions -->
+  <section class="section" id="design">
+    <h2 class="section-title"><span class="dot"></span>Key Design Decisions</h2>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Why Mock Agents, Not LangChain?</h3>
+        <p>The assessment mandates <code>docker run --rm --network none</code>, which prohibits all outbound network calls. A LangChain/LangGraph agent would call an LLM API on every invocation, violating this constraint. Mock agents with fixture data keep the execution harness fully testable and deterministic while making the LLM integration a single-adapter swap.</p>
+      </div>
+      <div class="card">
+        <h3>Why Protocol-Based Interfaces?</h3>
+        <p>Python Protocols enable structural (duck) typing without requiring inheritance. This means any class with the right properties satisfies the contract &mdash; both mock agents (fixture-backed) and future LLM agents (LangGraph StateGraph) can be used interchangeably without modifications to consuming code.</p>
+      </div>
+      <div class="card">
+        <h3>Why Injectable Sleep?</h3>
+        <p>The retry policy uses exponential backoff (50ms, 100ms delays). Injecting the sleep function lets tests replace <code>asyncio.sleep</code> with an instant mock, making 40 tests complete in 0.75s instead of waiting for real delays. Retry timing is verified by asserting the exact arguments passed to the mock.</p>
+      </div>
+      <div class="card">
+        <h3>Why Read-Only Retry?</h3>
+        <p>Read-only operations are inherently idempotent &mdash; repeating them has no side effects. Billing mutations are <strong>not</strong> idempotent: retrying after a timeout could double-charge a customer. Automatic retry of mutations requires idempotency keys and server-side deduplication, which are out of scope for this assessment.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Start -->
+  <section class="section">
+    <h2 class="section-title"><span class="dot"></span>Quick Start</h2>
+    <div class="card">
+      <div class="code-block" style="max-height:none;">
+<span class="header"># Show all available commands</span>
+./start_service.sh --helper
+
+<span class="header"># Start the service (auto-detects python3.11+, creates venv, installs deps)</span>
+./start_service.sh
+
+<span class="header"># Run tests only</span>
+./start_service.sh --test
+
+<span class="header"># Docker: build + run (proves no external calls with --network none)</span>
+./start_service.sh --docker
+
+<span class="header"># Docker: build + test</span>
+./start_service.sh --docker --test
+
+<span class="header"># Run acceptance checks (separate terminal, while server is running)</span>
+python tools/acceptance_check.py --base-url http://127.0.0.1:8000
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer class="footer">
+  <p>Observable Agent Gateway &bull; Assessment Report &bull; Dharmendra Singh &bull; Python 3.11.13 &bull; macOS 26.6.2 arm64</p>
+</footer>
+
+<script>
+function showTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>

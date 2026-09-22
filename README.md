@@ -1,5 +1,7 @@
 # Observable Agent Gateway
 
+> **[View Assessment Report](docs/assessment_report.html)** — Architecture, test results, and design decisions in one page. Auto-updates on every test and acceptance run.
+
 A production-structured, observable agent gateway built with **Python 3.11+** and **FastAPI**. Resolves capabilities, enforces identity and scope-based permissions, invokes mock tool adapters with failure simulation, enforces retry/timeout policies, and records structured execution traces.
 
 ---
@@ -135,6 +137,42 @@ Invoke an agent capability. Requires `Authorization: Bearer <token>`.
 ### `GET /traces/{request_id}`
 
 Retrieve the execution trace for a completed or failed invocation. Same bearer auth required; only the principal who made the request can access its trace.
+
+**Example** (use the `request_id` from a previous `/invoke` response):
+```bash
+  # First invoke to get a request_id
+  REQUEST_ID=$(curl -s http://127.0.0.1:8000/invoke \
+  -H "Authorization: Bearer demo-alpha-full" \
+  -H "Content-Type: application/json" \
+  -d '{"conversation_id":"c1","capability":"billing.summary","message":"test","simulation":"transient_then_ok"}' \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['request_id'])")
+
+  # Retrieve the trace
+  curl -s http://127.0.0.1:8000/traces/$REQUEST_ID \
+  -H "Authorization: Bearer demo-alpha-full" | python3 -m json.tool
+```
+```json
+{
+  "request_id": "req-...",
+  "conversation_id": "c1",
+  "tenant_id": "tenant-a",
+  "agent": "billing-agent",
+  "capability": "billing.summary",
+  "status": "completed",
+  "attempts": 3,
+  "duration_ms": 152.3,
+  "events": [
+    {"event": "attempt_started", "attempt": 1},
+    {"event": "attempt_failed", "attempt": 1, "code": "TRANSIENT"},
+    {"event": "retry_scheduled", "attempt": 1, "delay_ms": 50},
+    {"event": "attempt_started", "attempt": 2},
+    {"event": "attempt_failed", "attempt": 2, "code": "TRANSIENT"},
+    {"event": "retry_scheduled", "attempt": 2, "delay_ms": 100},
+    {"event": "attempt_started", "attempt": 3},
+    {"event": "attempt_succeeded", "attempt": 3}
+  ]
+}
+```
 
 ---
 

@@ -210,6 +210,58 @@ class Checks:
                 ] + [("overlapping request isolation", self.concurrency)]
 
 
+def update_acceptance_report(results, total, passed):
+    import html as html_mod
+    import re
+    report_path = Path(__file__).resolve().parents[1] / "docs" / "assessment_report.html"
+    if not report_path.exists():
+        return
+    try:
+        report = report_path.read_text()
+    except OSError:
+        return
+
+    lines = []
+    for name, status, detail in results:
+        if status == "PASS":
+            lines.append(f'<span class="pass">PASS</span> {html_mod.escape(name)}')
+        else:
+            lines.append(f'<span class="fail" style="color:var(--red)">FAIL</span> {html_mod.escape(name)}: {html_mod.escape(detail)}')
+    output_lines = "\n".join(lines)
+    summary_class = "pass" if passed == total else 'fail" style="color:var(--red)'
+    block = f'''      <div id="acceptance-output" class="tab-content">
+        <div class="code-block">
+<span class="header">$ python tools/acceptance_check.py --base-url http://127.0.0.1:8000</span>
+
+{output_lines}
+
+<span class="{summary_class}">{passed}/{total} check groups passed</span>
+        </div>
+      </div>'''
+    report = re.sub(
+        r"<!-- ACCEPTANCE_OUTPUT_START -->.*?<!-- ACCEPTANCE_OUTPUT_END -->",
+        f"<!-- ACCEPTANCE_OUTPUT_START -->\n{block}\n      <!-- ACCEPTANCE_OUTPUT_END -->",
+        report, flags=re.DOTALL,
+    )
+    hero = f'<div class="meta-item">Acceptance: <span>{passed}/{total}</span></div>'
+    report = re.sub(
+        r"<!-- HERO_ACCEPTANCE_STATS_START -->.*?<!-- HERO_ACCEPTANCE_STATS_END -->",
+        f"<!-- HERO_ACCEPTANCE_STATS_START -->{hero}<!-- HERO_ACCEPTANCE_STATS_END -->",
+        report, flags=re.DOTALL,
+    )
+    stat = f'''<div class="card stat-card">
+        <div class="number">{passed}/{total}</div>
+        <div class="label">Acceptance Checks</div>
+      </div>'''
+    report = re.sub(
+        r"<!-- STAT_ACCEPTANCE_START -->.*?<!-- STAT_ACCEPTANCE_END -->",
+        f"<!-- STAT_ACCEPTANCE_START -->{stat}<!-- STAT_ACCEPTANCE_END -->",
+        report, flags=re.DOTALL,
+    )
+    report_path.write_text(report)
+    print(f"Assessment report updated (docs/assessment_report.html)")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-url", default="http://127.0.0.1:8000")
@@ -224,15 +276,21 @@ def main():
     checks = Checks(HttpClient(args.base_url), json.loads(args.fixture.read_text()))
     failures = 0
     cases = checks.all()
+    results = []
     for name, run in cases:
         try:
             run()
             print(f"PASS {name}")
+            results.append((name, "PASS", ""))
         except Exception as exc:
             failures += 1
             print(f"FAIL {name}: {type(exc).__name__}: {exc}")
-    print(f"\n{len(cases) - failures}/{len(cases)} check groups passed")
+            results.append((name, "FAIL", f"{type(exc).__name__}: {exc}"))
+    total = len(cases)
+    passed = total - failures
+    print(f"\n{passed}/{total} check groups passed")
     print("HTTP checks do not prove internal call counts, non-blocking waits, cancellation or log privacy.")
+    update_acceptance_report(results, total, passed)
     return 1 if failures else 0
 
 
